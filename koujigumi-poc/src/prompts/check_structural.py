@@ -47,6 +47,62 @@ CHECK_STRUCTURAL_SYSTEM = """\
 4. 必ず推奨アクション（recommended_action）を書く
 5. confidence は確信度を0.0〜1.0で返す
 
+# Few-shot examples（鴻治組の過去指摘事例）
+
+以下は鴻治組で過去に指摘した代表3件です。同じ粒度・形式で指摘してください。
+各 example の出力は `StructuralIssue` のJSONスキーマに準拠します。
+
+<example index="1" pattern="サッシ開口幅と壁厚の不整合">
+<situation>S造6F事務所ビル、延床3,200m²、3F南面会議室のサッシ周辺</situation>
+<output>
+{
+  "severity": "critical",
+  "category": "window_structural",
+  "location": "3F 南面 会議室",
+  "issue": "サッシ開口幅2,700mmに対し、左右の壁厚が150mmしか確保されていない",
+  "detail": "S造ではサッシ両端の柱との取り合いで最低300mm以上の壁厚が必要。現状では方立の固定が構造的に不安定で、地震時のサッシ脱落リスクがある。",
+  "reference": "鴻治組2019年 事務所ビル案件で類似指摘あり。壁厚を250mmに増やして対応。",
+  "recommended_action": "設計事務所へ質疑：サッシ位置を200mmずらすか、方立を梁に直接固定する納まりに変更",
+  "confidence": 0.92,
+  "related_drawings": ["3F平面図", "3F南面立面図"]
+}
+</output>
+</example>
+
+<example index="2" pattern="意匠図と構造図のブレース位置矛盾">
+<situation>S造5F店舗併用ビル、1F東面エントランスのFIX窓周辺。意匠図と構造図で整合性確認</situation>
+<output>
+{
+  "severity": "critical",
+  "category": "design_consistency",
+  "location": "1F 東面 エントランスホール",
+  "issue": "意匠図でFIX窓として視界確保している位置に、構造図ではX型ブレースが配置されている",
+  "detail": "意匠図（A-02）ではFIX窓W3,600×H2,400で視界を遮らない計画だが、構造図（S-03）では同スパンにX型ブレースが配置。このまま施工すると意匠・構造どちらかの大幅変更が必須となり、工事後半での手戻りは数百万〜数千万円規模の損失につながる。",
+  "reference": "鴻治組2021年 店舗併用ビル案件で同様の指摘。意匠側で袖壁内にブレース位置を寄せて対応。",
+  "recommended_action": "意匠・構造設計者間で早期調整。ブレース位置を袖壁側に移動するか、FIX位置・サイズを見直す",
+  "confidence": 0.88,
+  "related_drawings": ["A-02 1F平面図", "S-03 1F軸組図"]
+}
+</output>
+</example>
+
+<example index="3" pattern="梁下端とサッシ上端のクリアランス不足">
+<situation>RC造4F事務所、2F西面執務室のサッシ上部と梁の取り合い</situation>
+<output>
+{
+  "severity": "warning",
+  "category": "window_structural",
+  "location": "2F 西面 執務室",
+  "issue": "梁下端とサッシ上端のクリアランスが60mmで、推奨値100mmを下回る",
+  "detail": "サッシ枠の取付スペースと防水立ち上がり寸法（通常80mm以上）が両立しにくく、雨仕舞いの品質リスクがある。施工は可能だが、シーリング施工精度への依存度が高まる。",
+  "reference": "鴻治組2020年 事務所改修案件で同様事例。サッシ天端を30mm下げて100mmクリアランスを確保し対応。",
+  "recommended_action": "サッシ高さを下げるか梁せいを見直す。変更困難なら納まり詳細図と防水仕様を設計事務所へ要請",
+  "confidence": 0.85,
+  "related_drawings": ["2F平面図", "矩計図", "サッシ詳細図"]
+}
+</output>
+</example>
+
 # やってはいけないこと
 
 - 図面に明記されていない情報を推測して指摘する
