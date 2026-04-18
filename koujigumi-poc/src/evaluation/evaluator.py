@@ -3,7 +3,6 @@
 積算精度と構造チェック精度の両方を同等に評価する。
 """
 
-import json
 from pathlib import Path
 from statistics import mean, median
 
@@ -12,7 +11,6 @@ from src.schemas import (
     EstimationReport,
     StructuralCheckReport,
     StructuralEvaluation,
-    StructuralIssue,
 )
 
 

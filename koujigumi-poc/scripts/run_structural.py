@@ -5,7 +5,6 @@ Usage:
 """
 
 import asyncio
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -65,20 +64,20 @@ async def run_check_async(pdf_path: Path, project_name: str, dry_run: bool) -> N
 
 @app.command()
 def main(
-    input: Path = typer.Option(..., "--input", "-i", help="図面PDFのパス"),
+    pdf: Path = typer.Option(..., "--input", "-i", help="図面PDFのパス"),
     name: str = typer.Option("対象物件", "--name", "-n", help="物件名"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     """構造的成立性チェックを実行。"""
-    if not input.exists():
-        console.print(f"[red]Error: File not found: {input}[/red]")
+    if not pdf.exists():
+        console.print(f"[red]Error: File not found: {pdf}[/red]")
         raise typer.Exit(1)
 
     console.print(
-        f"\n[bold cyan]=== 鴻治組 PoC 構造チェック（差別化機能） ===[/bold cyan]\n"
+        "\n[bold cyan]=== 鴻治組 PoC 構造チェック（差別化機能） ===[/bold cyan]\n"
     )
     console.print(f"[dim]対象: {name}[/dim]\n")
-    asyncio.run(run_check_async(input, name, dry_run))
+    asyncio.run(run_check_async(pdf, name, dry_run))
 
 
 if __name__ == "__main__":

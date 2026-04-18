@@ -42,7 +42,7 @@ async def run_estimation_async(pdf_path: Path, dry_run: bool) -> None:
         building = await extract_building_overview(pdf_path)
         progress.update(task, completed=True)
 
-        console.print(f"\n[green]✓[/green] 建物概要抽出完了")
+        console.print("\n[green]✓[/green] 建物概要抽出完了")
         console.print(f"  - 物件名: {building.project_name}")
         console.print(f"  - 用途: {building.usage}")
         console.print(f"  - 構造: {building.structure}")
@@ -92,16 +92,16 @@ def _print_dry_run_result(pdf_path: Path) -> None:
 
 @app.command()
 def main(
-    input: Path = typer.Option(..., "--input", "-i", help="設計図面PDFのパス"),
+    pdf: Path = typer.Option(..., "--input", "-i", help="設計図面PDFのパス"),
     dry_run: bool = typer.Option(False, "--dry-run", help="API呼び出しをスキップ"),
 ) -> None:
     """積算パイプラインを実行する。"""
-    if not input.exists():
-        console.print(f"[red]Error: File not found: {input}[/red]")
+    if not pdf.exists():
+        console.print(f"[red]Error: File not found: {pdf}[/red]")
         raise typer.Exit(1)
 
-    console.print(f"\n[bold cyan]=== 鴻治組 PoC 積算パイプライン ===[/bold cyan]\n")
-    asyncio.run(run_estimation_async(input, dry_run))
+    console.print("\n[bold cyan]=== 鴻治組 PoC 積算パイプライン ===[/bold cyan]\n")
+    asyncio.run(run_estimation_async(pdf, dry_run))
 
 
 if __name__ == "__main__":

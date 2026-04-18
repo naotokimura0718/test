@@ -7,25 +7,17 @@
 import json
 from pathlib import Path
 
+from src.prompts.extract_building_info import (
+    EXTRACT_BUILDING_INFO_SYSTEM,
+    EXTRACT_BUILDING_INFO_USER,
+)
 from src.readers.pdf_reader import pdf_to_images
 from src.readers.vision_reader import ask_claude_with_images
 from src.schemas import (
     BuildingOverview,
-    EstimationReport,
     EstimationResult,
     UnitPriceRecord,
 )
-
-
-EXTRACT_BUILDING_SYSTEM = """\
-あなたは建築積算の専門家です。設計図面から建物の基本情報を正確に抽出します。
-
-- 図面に明記されている情報のみを抽出する
-- 推測は避け、読み取れない項目は null を返す
-- 用途は「事務所」「住宅」「学校」「工場」「倉庫」等の日本語で記述
-- 構造は「S造」「RC造」「SRC造」「W造」等の略記で記述
-"""
-
 
 ESTIMATE_UNIT_SYSTEM = """\
 あなたは鴻治組の建築積算ベテランです。基本設計段階で構造図がない段階で、
@@ -48,28 +40,10 @@ async def extract_building_overview(pdf_path: Path) -> BuildingOverview:
     """図面PDFから建物概要を抽出（STEP 1）。"""
     images = pdf_to_images(pdf_path, dpi=200, first_page=1, last_page=3)
 
-    user_prompt = """\
-提供された設計図面から、建物の基本情報を抽出してください。
-以下の項目を読み取ってください：
-
-- project_name: 物件名
-- usage: 用途（事務所/住宅/学校/工場/倉庫 等）
-- structure: 構造（S造/RC造/SRC造/W造 等）
-- floors_above: 地上階数
-- floors_below: 地下階数（なければ0）
-- total_floor_area: 延床面積 m²
-- building_area: 建築面積 m²
-- max_height: 最高高さ m
-- span_x: 主要スパンX m
-- span_y: 主要スパンY m
-
-読み取れない項目は null にしてください。
-"""
-
     return await ask_claude_with_images(
         images=images,
-        system_prompt=EXTRACT_BUILDING_SYSTEM,
-        user_prompt=user_prompt,
+        system_prompt=EXTRACT_BUILDING_INFO_SYSTEM,
+        user_prompt=EXTRACT_BUILDING_INFO_USER,
         response_model=BuildingOverview,
     )
 
@@ -159,7 +133,7 @@ JSON配列形式で返してください（list[EstimationResult]）。
         pass
 
     # list[EstimationResult] を直接返させるためのラッパーモデル
-    from pydantic import BaseModel, RootModel
+    from pydantic import RootModel
 
     class EstimationResultList(RootModel[list[EstimationResult]]):
         pass
